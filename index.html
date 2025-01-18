@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equation Editor with Persistence</title>
+    <link rel="stylesheet" href="https://editor.codecogs.com/eqneditor.css"/>
+    <script src="https://editor.codecogs.com/eqneditor.api.min.js"></script>
+    <script>
+        window.onload = function () {
+            const textarea = EqEditor.TextArea.link('latexInput')
+                .addOutput(new EqEditor.Output('output'))
+                .addHistoryMenu(new EqEditor.History('history'));
+
+            EqEditor.Toolbar.link('toolbar').addTextArea(textarea);
+
+            let equationsList = JSON.parse(localStorage.getItem('equationsList')) || [];
+            const lastEquationKey = 'lastEquation';
+
+            const lastEquation = localStorage.getItem(lastEquationKey);
+            if (lastEquation) {
+                textarea.insert(lastEquation);
+            }
+
+            function updateEquationsList() {
+                const listContainer = document.getElementById('equations-list');
+                listContainer.innerHTML = '';
+
+                equationsList.forEach((equation, index) => {
+                    const equationContainer = document.createElement('div');
+                    equationContainer.style.display = 'flex';
+                    equationContainer.style.alignItems = 'center';
+                    equationContainer.style.marginBottom = '10px';
+
+                    const equationButton = document.createElement('button');
+                    equationButton.textContent = equation.name;
+                    equationButton.addEventListener('click', () => loadEquation(index));
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'X';
+                    deleteButton.style.marginLeft = '10px';
+                    deleteButton.addEventListener('click', () => deleteEquation(index));
+
+                    equationContainer.appendChild(equationButton);
+                    equationContainer.appendChild(deleteButton);
+
+                    listContainer.appendChild(equationContainer);
+                });
+            }
+
+            function saveEquation() {
+                let equation = textarea.getTextArea().innerText;
+                const name = prompt('Enter a name for this equation:', 'New Equation');
+                if (name) {
+                    equation = equation.endsWith(' ') ? equation.slice(0, -1) : equation;
+                    equationsList.push({ name, equation });
+                    localStorage.setItem('equationsList', JSON.stringify(equationsList));
+                    updateEquationsList();
+                }
+            }
+
+            function loadEquation(index) {
+                textarea.clear();
+                let equation = equationsList[index].equation;
+                textarea.insert(equation);
+            }
+
+            function deleteEquation(index) {
+                equationsList.splice(index, 1);
+                localStorage.setItem('equationsList', JSON.stringify(equationsList));
+                updateEquationsList();
+            }
+
+            function autosaveEquation() {
+                let equation = textarea.getTextArea().innerText;
+                equation = equation.endsWith(' ') ? equation.slice(0, -1) : equation;
+                localStorage.setItem(lastEquationKey, equation);
+            }
+
+            setInterval(autosaveEquation, 1000);
+
+            document.getElementById('save-equation').addEventListener('click', saveEquation);
+            document.getElementById('save-svg').addEventListener('click', () => saveAsImage('svg'));
+            document.getElementById('save-png').addEventListener('click', () => saveAsImage('png', 300));
+            document.getElementById('save-jpg').addEventListener('click', () => saveAsImage('jpg', 300));
+
+            function saveAsImage(format, resolution = 150) {
+                let equation = textarea.getTextArea().innerText;
+                const url = `https://latex.codecogs.com/${format}.latex?${encodeURIComponent(equation)}&dpi=${resolution}`;
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `equation.${format}`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
+            document.getElementById('save-equation').style.marginBottom = '10px';
+
+            updateEquationsList();
+        };
+    </script>
+</head>
+<body>
+    <div id="equation-editor">
+        <div id="history"></div>
+        <div id="toolbar"></div>
+        <div id="latexInput" placeholder="Write Equation here..."></div>
+        <div id="equation-output">
+            <img id="output">
+        </div>
+        <div>
+            <button id="save-equation">Save Equation</button>
+            <div id="equations-list"></div>
+        </div>
+        <div>
+            <button id="save-svg">Save as SVG</button>
+            <button id="save-png">Save as PNG</button>
+            <button id="save-jpg">Save as JPG</button>
+        </div>
+    </div>
+</body>
+</html>
