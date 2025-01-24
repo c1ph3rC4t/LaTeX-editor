@@ -84,9 +84,16 @@
             document.getElementById('save-png').addEventListener('click', () => saveAsImage('png', 300));
             document.getElementById('save-jpg').addEventListener('click', () => saveAsImage('jpg', 300));
 
+            function encodeHTML(input) {
+                const div = document.createElement('div');
+                div.textContent = input;
+                const encoded = div.innerHTML;
+                return encoded;
+            }
+
             function saveAsImage(format, resolution = 150) {
                 let equation = textarea.getTextArea().innerText;
-                const url = `https://latex.codecogs.com/${format}.image?${encodeURIComponent(equation)}&dpi=${resolution}`;
+                const url = `https://latex.codecogs.com/${format}.image?${encodeHTML(equation)}&dpi=${resolution}`;
                 const link = document.createElement('a');
                 link.href = url;
                 link.download = `equation.${format}`;
