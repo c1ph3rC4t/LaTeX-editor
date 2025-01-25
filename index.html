@@ -85,10 +85,72 @@
             document.getElementById('save-jpg').addEventListener('click', () => saveAsImage('jpg', 300));
 
             function encodeHTML(input) {
-                const div = document.createElement('div');
-                div.textContent = input;
-                const encoded = div.innerHTML;
-                return encoded;
+                const entityMap = {
+                    ' ': '&space;',
+                    '+': '&plus;',
+                    '"': '&quot;',
+                    "'": '&apos;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '&': '&amp;',
+                    '©': '&copy;',
+                    '®': '&reg;',
+                    '€': '&euro;',
+                    '£': '&pound;',
+                    '¥': '&yen;',
+                    '§': '&sect;',
+                    '°': '&deg;',
+                    '±': '&plusmn;',
+                    '÷': '&divide;',
+                    '×': '&times;',
+                    '•': '&bull;',
+                    '∞': '&infin;',
+                    '♫': '&sung;',
+                    '♪': '&fsl;',
+                    '→': '&rarr;',
+                    '←': '&larr;',
+                    '↑': '&uarr;',
+                    '↓': '&darr;',
+                    '⇔': '&harr;',
+                    '⇑': '&uArr;',
+                    '⇓': '&dArr;',
+                    '↔': '&lrarr;',
+                    '↕': '&varr;',
+                    '√': '&radic;',
+                    '∑': '&sum;',
+                    '∫': '&int;',
+                    '∩': '&cap;',
+                    '∪': '&cup;',
+                    '≠': '&ne;',
+                    '≡': '&equiv;',
+                    '≤': '&le;',
+                    '≥': '&ge;',
+                    '≈': '&asymp;',
+                    '∞': '&infin;',
+                    '∃': '&exist;',
+                    '∀': '&forall;',
+                    '∈': '&isin;',
+                    '∉': '&notin;',
+                    '∋': '&ni;',
+                    '⊂': '&sub;',
+                    '⊃': '&sup;',
+                    '⊆': '&sube;',
+                    '⊇': '&supe;',
+                    '⊕': '&oplus;',
+                    '⊗': '&otimes;',
+                    '⟶': '&rarr;',
+                    '⟸': '&larr;',
+                    '⟹': '&rarrb;',
+                    '⟸': '&larrb;',
+                    '⟷': '&mapsto;',
+                    '⟶': '&longrightarrow;',
+                    '⟶': '&longleftrightarrow;',
+                };
+            
+                return input
+                    .split('')
+                    .map(char => entityMap[char] || char)
+                    .join('');
             }
 
             function saveAsImage(format, resolution = 150) {
