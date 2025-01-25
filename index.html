@@ -82,7 +82,6 @@
             document.getElementById('save-equation').addEventListener('click', saveEquation);
             document.getElementById('save-svg').addEventListener('click', () => saveAsImage('svg'));
             document.getElementById('save-png').addEventListener('click', () => saveAsImage('png', 300));
-            document.getElementById('save-jpg').addEventListener('click', () => saveAsImage('jpg', 300));
 
             function encodeHTML(input) {
                 const entityMap = {
@@ -156,12 +155,17 @@
             function saveAsImage(format, resolution = 150) {
                 let equation = textarea.getTextArea().innerText;
                 const url = `https://latex.codecogs.com/${format}.image?\\dpi{${resolution}}${encodeHTML(equation)}`;
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `equation.${format}`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                fetch(url)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = `equation.${format}`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    })
+                    .catch(error => console.error('Error downloading image:', error));
             }
 
             document.getElementById('save-equation').style.marginBottom = '10px';
@@ -185,7 +189,6 @@
         <div>
             <button id="save-svg">Save as SVG</button>
             <button id="save-png">Save as PNG</button>
-            <button id="save-jpg">Save as JPG</button>
         </div>
     </div>
 </body>
