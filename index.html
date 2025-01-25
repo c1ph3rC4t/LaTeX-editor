@@ -155,7 +155,7 @@
 
             function saveAsImage(format, resolution = 150) {
                 let equation = textarea.getTextArea().innerText;
-                const url = `https://latex.codecogs.com/${format}.image?${encodeHTML(equation)}&dpi=${resolution}`;
+                const url = `https://latex.codecogs.com/${format}.image?\\dpi{${resolution}}${encodeHTML(equation)}`;
                 const link = document.createElement('a');
                 link.href = url;
                 link.download = `equation.${format}`;
